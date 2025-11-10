@@ -1,24 +1,17 @@
 import mysql.connector as mycon
 
-# --------------------------- LOGIN ---------------------------
-
-def login(username, password):
-    global cur
-    global con
-    try:
-        con = mycon.connect(host="localhost", user=f"{username}", passwd=f"{password}")
-        cur = con.cursor()
-        cur.execute("use RDBMS")
-    except:
-        print("Incorrect Username or Password")
-        exit()
-
 username = input("username: ")
 password = input("password: ")
-login(username, password)
+con = mycon.connect(host="localhost", user=f"{username}", passwd=f"{password}")
+cur = con.cursor()
+cur.execute("SHOW DATABASES")
+for dbname in cur:
+    if("RDBMS" in dbname):
+        continue
+    else:
+        cur.execute("Create database RDBMS")
 
-# --------------------------- OUTPUT ---------------------------
-
+#OUTPUT
 def output(data):
     if not data:
         print("(no rows)\n")
@@ -30,51 +23,44 @@ def output(data):
         print()
     print()
 
-# --------------------------- INSERT FUNCTIONS ---------------------------
-
+#insert
 def add_assignment():
-    a    = input("Assignment Number: ")
+    ano = input("Assignment Number: ")
     name = input("Assignment Name: ")
     date = input("Due Date (YYYY-MM-DD): ")
     sub  = input("Subject: ")
-
-    cur.execute(f"INSERT INTO Assignments VALUES({a},'{name}','{date}','{sub}')")
+    cur.execute(f"INSERT INTO Assignments VALUES({ano},'{name}','{date}','{sub}')")
     con.commit()
-
     print("Inserted.\n")
 
 def add_student():
     sid = input("Student ID: ")
-    fn  = input("First Name: ")
-    mn  = input("Middle Name (or blank): ") or None
-    ln  = input("Last Name: ")
+    fn = input("First Name: ")
+    mn = input("Middle Name (or blank): ") or None
+    ln = input("Last Name: ")
     dob = input("DOB (YYYY-MM-DD): ")
-    ph  = input("Phone Number: ")
-    a   = input("Assignment Number: ")
-
+    ph = input("Phone Number: ")
+    a = input("Assignment Number: ")
     cur.execute(f"INSERT INTO Student VALUES({sid},'{fn}','{mn}','{ln}','{dob}',{ph},{a})")
     con.commit()
-
     print("Inserted.\n")
 
 def add_class():
-    cid   = input("Class ID: ")
+    cid = input("Class ID: ")
     cname = input("Class Name: ")
-    t     = input("Timing: ")
-
+    t = input("Timing: ")
     cur.execute(f"INSERT INTO Classes VALUES({cid},'{cname}','{t}')")
     con.commit()
-
     print("Inserted.\n")
 
 def add_professor():
     pid = input("Professor ID: ")
     dep = input("Department: ")
-    fn  = input("First Name: ")
-    mn  = input("Middle Name (or blank): ") or None
-    ln  = input("Last Name: ")
-    ph  = input("Phone Number: ")
-    a   = input("Assignment Number: ")
+    fn = input("First Name: ")
+    mn = input("Middle Name (or blank): ") or None
+    ln = input("Last Name: ")
+    ph = input("Phone Number: ")
+    a = input("Assignment Number: ")
     cid = input("Class ID: ")
 
     cur.execute(
@@ -85,38 +71,31 @@ def add_professor():
     print("Inserted.\n")
 
 def add_material():
-    br  = input("Branch: ")
+    br = input("Branch: ")
     pid = input("Professor ID: ")
-
     cur.execute(f"INSERT INTO Study_Material VALUES('{br}',{pid})")
     con.commit()
-
     print("Inserted.\n")
 
 def add_quiz():
     qid = input("Quiz ID: ")
-    m   = input("Marks: ")
-    t   = input("Type: ")
-    lb  = input("Leaderboard: ")
-    tp  = input("Topic: ")
-    dt  = input("Date (YYYY-MM-DD): ")
-
+    m = input("Marks: ")
+    t = input("Type: ")
+    lb = input("Leaderboard: ")
+    tp = input("Topic: ")
+    dt = input("Date (YYYY-MM-DD): ")
     cur.execute(f"INSERT INTO Quiz VALUES({qid},{m},'{t}',{lb},'{tp}','{dt}')")
     con.commit()
-
     print("Inserted.\n")
 
 def add_enrollment():
     sid = input("Student ID: ")
     cid = input("Class ID: ")
-
     cur.execute(f"INSERT INTO Enrolls_in VALUES({sid},{cid})")
     con.commit()
-
     print("Inserted.\n")
 
-# --------------------------- SEARCH ---------------------------
-
+#search
 def search_student():
     sid = input("Student ID: ")
     cur.execute(f"SELECT * FROM Student WHERE student_id={sid}")
@@ -132,8 +111,7 @@ def search_class():
     cur.execute(f"SELECT * FROM Classes WHERE Class_id={cid}")
     output(cur.fetchall())
 
-# --------------------------- DELETE ---------------------------
-
+#delete
 def delete_student():
     sid = input("Student ID to delete: ")
     cur.execute(f"DELETE FROM Student WHERE student_id={sid}")
@@ -152,8 +130,7 @@ def delete_class():
     con.commit()
     print("Deleted.\n")
 
-# --------------------------- DISPLAY ---------------------------
-
+#display
 def display_assignments():
     cur.execute("SELECT * FROM Assignments")
     output(cur.fetchall())
@@ -182,93 +159,89 @@ def display_enrollments():
     cur.execute("SELECT * FROM Enrolls_in")
     output(cur.fetchall())
 
-# --------------------------- MENUS ---------------------------
 
-def display_menu():
+def display():
     while True:
-        print("1.Display Assignments")
-        print("2.Display Students")
-        print("3.Display Classes")
-        print("4.Display Professors")
-        print("5.Display Study Material")
-        print("6.Display Quiz")
-        print("7.Display Enrollments")
-        print("0.Back")
+        print("\n1)Assignments\t\t2)Students\t\t3)Classes\t\t4)Professors\t\t5)Study Material\t\t6)Quiz\t\t7)Enrollments\t\t0)Back\n(1/2/3/4/0): ")
+        c2 = input("Enter choice: ")
+        if c2 == "1": 
+            display_assignments()
+        elif c2 == "2": 
+            display_students()
+        elif c2 == "3": 
+            display_classes()
+        elif c2 == "4": 
+            display_professors()
+        elif c2 == "5": 
+            display_material()
+        elif c2 == "6": 
+            display_quiz()
+        elif c2 == "7": 
+            display_enrollments()
+        elif c2 == "0": 
+            break
 
-        c = input("Enter choice: ")
-
-        if   c == "1": display_assignments()
-        elif c == "2": display_students()
-        elif c == "3": display_classes()
-        elif c == "4": display_professors()
-        elif c == "5": display_material()
-        elif c == "6": display_quiz()
-        elif c == "7": display_enrollments()
-        elif c == "0": break
-
-def insert_menu():
+def insert():
     while True:
-        print("1.Add Assignment")
-        print("2.Add Student")
-        print("3.Add Class")
-        print("4.Add Professor")
-        print("5.Add Study Material")
-        print("6.Add Quiz")
-        print("7.Add Enrollment")
-        print("0.Back")
+        print("\n1)Assignments\t\t2)Students\t\t3)Classes\t\t4)Professors\t\t5)Study Material\t\t6)Quiz\t\t7)Enrollments\t\t0)Back\n(1/2/3/4/0): ")
+        c3 = input("Enter choice: ")
+        if c3 == "1": 
+            add_assignment()
+        elif c3 == "2": 
+            add_student()
+        elif c3 == "3": 
+            add_class()
+        elif c3 == "4": 
+            add_professor()
+        elif c3 == "5": 
+            add_material()
+        elif c3 == "6": 
+            add_quiz()
+        elif c3 == "7": 
+            add_enrollment()
+        elif c3 == "0": 
+            break
 
-        c = input("Enter choice: ")
-
-        if   c == "1": add_assignment()
-        elif c == "2": add_student()
-        elif c == "3": add_class()
-        elif c == "4": add_professor()
-        elif c == "5": add_material()
-        elif c == "6": add_quiz()
-        elif c == "7": add_enrollment()
-        elif c == "0": break
-
-def search_menu():
+def search():
     while True:
-        print("1.Search Student")
-        print("2.Search Professor")
-        print("3.Search Class")
-        print("0.Back")
+        print("1)Student\t\t2)Professor\t\t3)Class\t\t0)Back\n(1/2/3/0): ")
+        c4 = input("Enter choice: ")
+        if c4 == "1": 
+            search_student()
+        elif c4 == "2": 
+            search_professor()
+        elif c4 == "3": 
+            search_class()
+        elif c4 == "0": 
+            break
 
-        c = input("Enter choice: ")
-
-        if   c == "1": search_student()
-        elif c == "2": search_professor()
-        elif c == "3": search_class()
-        elif c == "0": break
-
-def delete_menu():
+def delete():
     while True:
-        print("1.Delete Student")
-        print("2.Delete Professor")
-        print("3.Delete Class")
-        print("0.Back")
+        print("1)Student\t\t2)Professor\t\t3)Class\t\t0)Back")
+        c5 = input("Enter choice: ")
+        if c5 == "1": 
+            delete_student()
+        elif c5 == "2": 
+            delete_professor()
+        elif c5 == "3": 
+            delete_class()
+        elif c5 == "0": 
+            break
 
-        c = input("Enter choice: ")
-
-        if   c == "1": delete_student()
-        elif c == "2": delete_professor()
-        elif c == "3": delete_class()
-        elif c == "0": break
-
-# --------------------------- MAIN MENU ---------------------------
 
 def menu():
     while True:
-        print("\n1.Display Records   2.Insert Records   3.Search Records   4.Delete Record   0.Exit")
-        c = input("Enter choice: ")
-
-        if   c == "1": display_menu()
-        elif c == "2": insert_menu()
-        elif c == "3": search_menu()
-        elif c == "4": delete_menu()
-        elif c == "0":
+        print("\n1)Display\t\t2)Insert\t\t3)Search\t\t4)Delete\t\t0)Exit\n(1/2/3/4/0): ")
+        c1 = input("Choice: ")
+        if   c1 == "1": 
+            display()
+        elif c1 == "2": 
+            insert()
+        elif c1 == "3": 
+            search()
+        elif c1 == "4": 
+            delete()
+        elif c1 == "0":
             print("Bye!!")
             break
-
 menu()
