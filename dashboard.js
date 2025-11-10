@@ -35,15 +35,13 @@ new Chart(document.getElementById("progressChart"), {
     }
   }
 });
-// Course completion percentages
+
 const courseCompletion = [90, 60, 80, 30, 68];
 
-// Convert each to GPA
 const gpas = courseCompletion.map(p => (p / 100 * 4));
 
-// Calculate average GPA
 const totalGPA = gpas.reduce((sum, val) => sum + val, 0);
 const averageGPA = (totalGPA / gpas.length).toFixed(2);
 
-// Display in HTML
 document.getElementById("gpaScore").textContent = averageGPA;
+
